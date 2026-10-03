@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Online Course</title>
+</head>
+<body>
+    {% load static %}
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'onlinecourse:index' %}">Home</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="btn btn-link" href="{% url 'onlinecourse:logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                    <a class="btn btn-link" href="{% url 'onlinecourse:registration' %}">Signup</a>
+                </li>
+                <li>
+                    <a class="btn btn-link" href="{% url 'onlinecourse:login' %}">Login</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mt-3">Popular Courses</h2>
+        {% for course in course_list %}
+        <div class="card mt-3">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    {% if course.image %}
+                    <img class="card-img" src="{{ course.image.url }}" alt="{{ course.name }}">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.name }}</h5>
+                        <p class="card-text">{{ course.description }}</p>
+                        <p class="card-text"><small class="text-muted">{{ course.total_enrollment }} enrolled</small></p>
+                        {% if user.is_authenticated %}
+                            {% if course.is_enrolled %}
+                            <a class="btn btn-info" href="{% url 'onlinecourse:course_details' course.id %}">View Course</a>
+                            {% else %}
+                            <form action="{% url 'onlinecourse:enroll' course.id %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" type="submit">Enroll</button>
+                            </form>
+                            {% endif %}
+                        {% else %}
+                        <a class="btn btn-primary" href="{% url 'onlinecourse:login' %}">Login to Enroll</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
